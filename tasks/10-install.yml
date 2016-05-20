@@ -1,0 +1,57 @@
+---
+
+- name: Check workspace
+  stat:
+    path: "{{ workspace }}"
+  register: workspace_file
+
+- name: Create workspace
+  file:
+    path: "{{ workspace }}"
+    state: directory
+  when: workspace_file.stat.exists == False
+
+- name: Set release name
+  set_fact: symfony_relase_name="{{ lookup('pipe', 'date +%Y-%m-%d-%H-%M-%S') }}"
+
+- name: Set workspace_release_dir dir
+  set_fact: workspace_release_dir="{{ workspace }}/{{ symfony_relase_name }}"
+
+- name: Create workspace_release_dir directory
+  file:
+    path: "{{ workspace_release_dir }}"
+    state: directory
+
+- name: Clone project
+  git:
+    repo: "{{ symfony_project_repo }}"
+    dest: "{{ workspace_release_dir }}"
+    version: "{{ symfony_project_branch }}"
+
+- name: Set symfony_release_commit_hash
+  shell: git rev-parse HEAD
+  args:
+    chdir: "{{ workspace_release_dir }}"
+  register: symfony_release_commit_hash
+
+- name: Run composer install
+  command: "composer install --prefer-dist --optimize-autoloader --no-dev --no-interaction"
+  args:
+    chdir: "{{ workspace_release_dir }}"
+
+- name: Install assets
+  command: "{{ symfony_console }} assets:install"
+  args:
+    chdir: "{{ workspace_release_dir }}"
+
+- name: Assetic dump
+  command: "{{ symfony_console }} assetic:dump"
+  args:
+    chdir: "{{ workspace_release_dir }}"
+  when: symfony_assetic_dump == true
+
+- name: Ensure shared folders are absent in release.
+  file:
+    state: absent
+    path: "{{ workspace_release_dir}}/{{ item.path }}"
+  with_items: "{{ symfony_project_shared_folders }}"

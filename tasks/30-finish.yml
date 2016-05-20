@@ -1,0 +1,20 @@
+---
+
+- name: Clear cache
+  shell: "{{symfony_console}} cache:clear --no-debug"
+  args:
+    chdir: "{{ symfony_current_release_dir }}"
+  become_user: "{{ www_user }}"
+  become: yes
+
+- name: Reload php-fpm
+  service:
+    name: php5-fpm
+    state: restarted
+  become: true
+
+- name: Live switch
+  file:
+    src: "{{ symfony_current_release_dir }}"
+    dest: "{{ symfony_current_dir }}"
+    state: link

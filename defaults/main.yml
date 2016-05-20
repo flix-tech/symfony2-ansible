@@ -1,0 +1,24 @@
+---
+workspace: "/tmp/{{ symfony_project_name }}"
+
+symfony_project_env: ~
+symfony_project_repo: ~
+symfony_project_web_dir: ~
+symfony_project_name: ~
+symfony_project_branch: master
+symfony_project_console_path: "app/console"
+symfony_project_composer_path: "/usr/local/bin/composer"
+symfony_console: "php {{ symfony_project_console_path }}"
+symfony_assetic_dump: true
+symfony_project_shared_folders:
+  - name: logs
+    path: app/logs
+
+www_user: www-data
+
+# Hooks
+symfony_pre_install_hook: hooks/symfony_pre_install_hook.yml
+symfony_post_install_hook: hooks/symfony_post_install_hook.yml
+symfony_post_archive_hook: hooks/symfony_post_archive_hook.yml
+symfony_post_deploy_hook: hooks/symfony_post_deploy_hook.yml
+symfony_post_finish_hook: hooks/symfony_post_finish_hook.yml

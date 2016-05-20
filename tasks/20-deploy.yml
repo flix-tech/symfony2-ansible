@@ -1,0 +1,51 @@
+---
+
+- name: Set release dir
+  set_fact: symfony_release_dir="{{ symfony_project_web_dir }}/releases"
+
+- name: Set current dir
+  set_fact: symfony_current_dir="{{ symfony_project_web_dir }}/current"
+
+- name: Create release deployment directory.
+  file:
+    state: directory
+    path: "{{ item.path }}"
+  with_items:
+    - { path: "{{ symfony_release_dir }}" }
+
+- name: Set shared dir
+  set_fact: symfony_shared_dir="{{ symfony_project_web_dir }}/shared"
+
+- name: Create shared deployment directories.
+  file:
+    path: "{{ symfony_shared_dir }}/{{ item.path }}"
+    state: directory
+  with_items: "{{ symfony_project_shared_folders }}"
+
+- name: Set current release dir
+  set_fact: symfony_current_release_dir="{{ symfony_release_dir }}/{{ symfony_relase_name }}"
+
+- name: Synchronize release.
+  synchronize:
+    src: "{{ workspace_release_dir }}"
+    dest: "{{ symfony_release_dir }}"
+
+- name: Create shared symlinks
+  file:
+    src: "{{ symfony_shared_dir }}/{{ item.path }}"
+    dest: "{{ symfony_current_release_dir }}/{{ item.path }}"
+    state: link
+  with_items: "{{ symfony_project_shared_folders }}"
+
+- name: Set permissions.
+  shell: "chown -R www-data:www-data {{ symfony_current_release_dir }}"
+  become: true
+
+- name: Run migrations
+  command: "{{symfony_console}} doctrine:migrations:migrate -n"
+  args:
+    chdir: "{{ symfony_current_release_dir }}"
+  when: symfony_project_run_migrations == true
+  run_once: true
+  become_user: "{{ www_user }}"
+  become: yes

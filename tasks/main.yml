@@ -1,0 +1,17 @@
+---
+
+- include: "{{ symfony_pre_install_hook }}"
+
+- include: 10-install.yml
+  run_once: true
+  delegate_to: 127.0.0.1
+
+- include: "{{ symfony_post_install_hook }}"
+
+- include: 20-deploy.yml
+
+- include: "{{ symfony_post_deploy_hook }}"
+
+- include: 30-finish.yml
+
+- include: "{{ symfony_post_finish_hook }}"
