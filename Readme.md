@@ -42,4 +42,4 @@ Example playbook:
 
   environment:
     SYMFONY_ENV: "{{` symfony_project_env }}"
-``
+```
