@@ -35,11 +35,11 @@ Example playbook:
     symfony_project_web_dir: /var/www/project.tld
     symfony_project_run_migrations: false
     symfony_assetic_dump: true
-`
+
     # Hooks
     symfony_post_install_hook: "{{ playbook_dir }}/files/hooks/post_install.yml"
     symfony_post_finish_hook: "{{ playbook_dir }}/files/hooks/post_finish.yml"
 
   environment:
-    SYMFONY_ENV: "{{ symfony_project_env }}"
+    SYMFONY_ENV: "{{` symfony_project_env }}"
 ``
