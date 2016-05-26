@@ -35,7 +35,7 @@
   register: symfony_release_commit_hash
 
 - name: Run composer install
-  command: "composer install --prefer-dist --optimize-autoloader --no-dev --no-interaction"
+  command: "{{ symfony_project_composer_path }} install --prefer-dist --optimize-autoloader --no-dev --no-interaction"
   args:
     chdir: "{{ workspace_release_dir }}"
 
