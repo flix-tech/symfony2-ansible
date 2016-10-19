@@ -7,12 +7,6 @@
   become_user: "{{ www_user }}"
   become: yes
 
-- name: Reload php-fpm
-  service:
-    name: php5-fpm
-    state: restarted
-  become: true
-
 - name: Live switch
   file:
     src: "{{ symfony_current_release_dir }}"
